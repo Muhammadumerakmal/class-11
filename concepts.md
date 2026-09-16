@@ -88,7 +88,9 @@ Two things to notice.
 
 `on_start` and `on_end` are the per-agent names. `on_agent_start` and `on_agent_end` are the run-level names, and the run-level versions fire once for every agent that takes part. If you override `on_agent_start` on an `AgentHooks` subclass, nothing happens and nothing warns you. Python just sees an extra method the SDK never calls.
 
-`on_handoff` means something different on each side. On `AgentHooks` the point of view is the receiver: "I was just handed this, and here is who sent it." On `RunHooks` the point of view is the director: "this one left, that one arrived."
+`on_handoff` means something different on each side. On `AgentHooks` the arguments are `(context, agent, source)`, where `agent` is the destination and `source` is the sender. On `RunHooks` the point of view is the director: "this one left, that one arrived."
+
+One detail worth knowing from running it (SDK 0.22.2, `run_internal/turn_resolution.py`): the SDK calls `AgentHooks.on_handoff` on the hooks of the agent doing the handing off, not the receiver. So hooks attached to `WeatherAgent` do see the handoff as their final event. What they never see is anything `NewsAgent` does afterwards.
 
 The runner keyword is `hooks=`, the same word used on `Agent(...)`. There is no separate `run_hooks=` argument. The class you pass decides which set of methods gets called.
 
